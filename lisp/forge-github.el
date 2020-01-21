@@ -564,6 +564,15 @@
                                    (open   "CLOSED"))))
                      :callback (forge--set-field-callback)))
 
+(cl-defmethod forge--set-topic-milestone ; TODO
+  ((_repo forge-github-repository) _topic milestone)
+  (message "-- %S" milestone)
+  ;; (forge--ghub-patch topic
+  ;;                    "/repos/:owner/:repo/issues/:number"
+  ;;                    `((milestone . ,(oref topic milestone))) ; TODO a number
+  ;;                    :callback (forge--set-field-callback))
+  )
+
 (cl-defmethod forge--set-topic-labels
   ((_repo forge-github-repository) topic labels)
   (forge--ghub-put topic "/repos/:owner/:repo/issues/:number/labels" nil

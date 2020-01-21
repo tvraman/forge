@@ -449,6 +449,11 @@ identifier."
             (symbol-name (oref topic state))
             "\n")))
 
+(defvar forge-topic-milestone-section-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [remap magit-edit-thing] 'forge-edit-topic-milestone)
+    map))
+
 (cl-defun forge-insert-topic-milestone
     (&optional (topic forge-buffer-topic))
   (magit-insert-section (topic-milestone)
