@@ -43,7 +43,7 @@
 (defclass forge-database (closql-database)
   ((object-class :initform forge-repository)))
 
-(defconst forge--db-version 6)
+(defconst forge--db-version 7)
 (defconst forge--sqlite-available-p
   (with-demoted-errors "Forge initialization: %S"
     (emacsql-sqlite-ensure-binary)
@@ -116,7 +116,8 @@
       (revnotes  :default eieio-unbound)
       (pullreqs  :default eieio-unbound)
       selective-p
-      worktree])
+      worktree
+      (milestones :default eieio-unbound)])
 
     (assignee
      [(repository :not-null)
@@ -227,6 +228,20 @@
       name
       face
       description])
+
+    (milestone
+     [(repository :not-null)
+      (id :not-null :primary-key)
+      number
+      title
+      created
+      updated
+      due
+      closed
+      description]
+     (:foreign-key
+      [repository] :references repository [id]
+      :on-delete :cascade))
 
     (notification
      [(class :not-null)
@@ -386,6 +401,29 @@
       (emacsql db "PRAGMA user_version = 6")
       (setq version 6)
       (message "Upgrading Forge database from version 5 to 6...done"))
+    (when (= version 6) ; FIXME
+      (message "Upgrading Forge database from version 6 to 7...")
+      (emacsql db [:create-table milestone $S1]
+               (cdr (assq 'milestone forge--db-table-schemata)))
+      (emacsql db [:alter-table repository :add-column milestones :default $i1]
+               eieio-unbound)
+      (pcase-dolist (`(,repo-id ,issue-id ,milestone)
+                     (emacsql db [:select [repository id milestone]
+                                  :from issue
+                                  :where (notnull milestone)]))
+        (unless (stringp milestone)
+          (oset (forge-get-issue issue-id) milestone
+                (forge--object-id repo-id (cdar milestone)))))
+      (pcase-dolist (`(,repo-id ,pullreq-id ,milestone)
+                     (emacsql db [:select [repository id milestone]
+                                  :from pullreq
+                                  :where (notnull milestone)]))
+        (unless (stringp milestone)
+          (oset (forge-get-pullreq pullreq-id) milestone
+                (forge--object-id repo-id (cdar milestone)))))
+      (emacsql db "PRAGMA user_version = 7")
+      (setq version 7)
+      (message "Upgrading Forge database from version 6 to 7...done"))
     version))
 
 ;;; _
