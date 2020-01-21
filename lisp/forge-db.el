@@ -369,8 +369,8 @@
         (when (memq table '(notification
                             mark issue-mark pullreq-mark))
           (emacsql db [:create-table $i1 $S2] table schema)))
-      (emacsql db [:alter-table issue   :add-column mark :default $i1] eieio-unbound)
-      (emacsql db [:alter-table pullreq :add-column mark :default $i1] eieio-unbound)
+      (emacsql db [:alter-table issue   :add-column marks :default $i1] eieio-unbound)
+      (emacsql db [:alter-table pullreq :add-column marks :default $i1] eieio-unbound)
       (emacsql db "PRAGMA user_version = 4")
       (setq version 4)
       (message "Upgrading Forge database from version 3 to 4...done"))
