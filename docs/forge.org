@@ -694,12 +694,12 @@ dedicated buffers:
 
 *** Creating Topics
 
-- Key: ' p, forge-create-pullreq
+- Key: ' c p, forge-create-pullreq
 - Key: C-c C-n [on "Pull requests" section], forge-create-pullreq
 
   This command creates a new pull-request for the current repository.
 
-- Key: ' i, forge-create-issue
+- Key: ' c i, forge-create-issue
 - Key: C-c C-n [on "Issues" section], forge-create-pullreq
 
   This command creates a new issue for the current repository.
